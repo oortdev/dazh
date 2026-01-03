@@ -4,166 +4,29 @@
 <meta charset="UTF-8" />
 <title>Hexagon Dashboard – Honeycomb Grid</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-:root {
-  --hex-width: 120px;
-  --hex-height: 104px;
-  --hex-vertical-gap: 12px;
-
-  --bg: {{ .Theme.BackgroundColor }};
-  --tile: {{ .Theme.MenuColor }};
-  --tile-hover: #334155;
-  --text: #e5e7eb;
-  --accent: #38bdf8;
-}
-
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: var(--text);
-  background: var(--bg)
-    {{ if .Theme.BackgroundImage }} url('{{ .Theme.BackgroundImage }}') center/cover no-repeat{{ end }};
-}
-
-/* TOP MENU BAR */
-.top-bar {
-  width: 100%;
-  background: var(--tile);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-}
-
-.top-bar .filter select {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: none;
-  background: #334155;
-  color: var(--text);
-  cursor: pointer;
-}
-
-.top-bar button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  background: var(--accent);
-  color: #020617;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.top-bar button:hover {
-  background: #0ea5e9;
-}
-
-/* HONEYCOMB GRID */
-.dashboard-wrapper {
-  display: flex;
-  justify-content: center;
-  padding: 40px 20px;
-}
-
-.dashboard {
-  display: flex;
-  flex-wrap: wrap;
-  width: max-content;
-}
-
-/* HEX TILE */
-.hex {
-  position: relative;
-  width: var(--hex-width);
-  height: var(--hex-height);
-  background: var(--tile);
-  clip-path: polygon(
-    25% 0%, 75% 0%,
-    100% 50%,
-    75% 100%, 25% 100%,
-    0% 50%
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  margin: calc(var(--hex-vertical-gap)/2) 6px;
-  cursor: pointer;
-  transition: transform 0.2s ease, background 0.2s ease;
-  text-decoration: none;
-  color: var(--text);
-}
-
-.hex:nth-child(2n+1) {
-  margin-top: calc(var(--hex-height)/2);
-}
-
-.hex:hover {
-  background: var(--tile-hover);
-  transform: translateY(-6px);
-}
-
-.hex span {
-  font-size: 0.95rem;
-  font-weight: 500;
-  pointer-events: none;
-}
-
-.hex.accent {
-  background: linear-gradient(135deg, var(--accent), #0ea5e9);
-  color: #020617;
-  font-weight: 600;
-}
-
-@media (max-width: 600px) {
-  .hex:nth-child(2n+1) {
-    margin-top: 0;
-  }
-  .dashboard {
-    justify-content: center;
-  }
-}
-</style>
+<link rel="stylesheet" href="/static/dashboard.css">
 </head>
 <body>
 
-<!-- TOP MENU BAR -->
+<!-- Top Menu -->
 <div class="top-bar">
-  <div class="filter">
-    <form method="get">
-      <label>
-        Filter by group:
-        <select name="group" onchange="this.form.submit()">
-          <option value="">All</option>
-          {{ range .AllGroups }}
-            <option value="{{ . }}" {{ if eq $.SelectedGrp . }}selected{{ end }}>{{ . }}</option>
-          {{ end }}
-        </select>
-      </label>
-    </form>
-  </div>
-  <div>
-    <button onclick="window.location='/manage'">Manage</button>
-  </div>
+    <div>Dashboard</div>
+    <div>
+        <button onclick="window.location='/manage'">⚙ Manage</button>
+    </div>
 </div>
 
-<!-- HONEYCOMB GRID -->
-<div class="dashboard-wrapper">
-  <div class="dashboard">
-    {{ range $group, $items := .Groups }}
-      {{ if or (eq $.SelectedGrp "") (eq $.SelectedGrp $group) }}
+<!-- Honeycomb Grid -->
+<div class="dashboard">
+    <div class="hex accent"><span>Dashboard</span></div>
+
+    {{ range $grp, $items := .Groups }}
         {{ range $items }}
-          <a href="{{ .URL }}" class="hex" style="background: {{ .Color }}">
-            <span>{{ .Name }}</span>
-          </a>
+        <div class="hex" style="background: {{ if .Image }} url('{{ .Image }}') center/cover no-repeat; {{ else }} {{ .Color }}; {{ end }}">
+            <a href="{{ .URL }}" style="color:inherit; text-decoration:none;"><span>{{ .Name }}</span></a>
+        </div>
         {{ end }}
-      {{ end }}
     {{ end }}
-  </div>
 </div>
 
 </body>

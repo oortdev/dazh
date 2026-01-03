@@ -6,7 +6,6 @@ import (
 	"strconv"
 )
 
-// LoadItems reads items from CSV and returns []Item
 func LoadItems() []Item {
 	file, err := os.Open("config/url.csv")
 	if err != nil {
@@ -22,7 +21,7 @@ func LoadItems() []Item {
 
 	items := []Item{}
 	for _, row := range rows {
-		if len(row) < 5 {
+		if len(row) < 6 {
 			continue
 		}
 		id, _ := strconv.Atoi(row[0])
@@ -32,12 +31,12 @@ func LoadItems() []Item {
 			URL:   row[2],
 			Group: row[3],
 			Color: row[4],
+			Image: row[5],
 		})
 	}
 	return items
 }
 
-// SaveItems writes []Item to CSV
 func SaveItems(items []Item) error {
 	file, err := os.Create("config/url.csv")
 	if err != nil {
@@ -55,16 +54,15 @@ func SaveItems(items []Item) error {
 			item.URL,
 			item.Group,
 			item.Color,
+			item.Image,
 		}
 		if err := w.Write(row); err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
-// getNextID returns the next available ID
 func getNextID(items []Item) int {
 	maxID := 0
 	for _, i := range items {

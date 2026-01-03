@@ -6,155 +6,54 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="/static/dashboard.css">
 <style>
-body {
-    margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    color: var(--text);
-    background: {{ .Theme.BackgroundColor }}
-        {{ if .Theme.BackgroundImage }} url('{{ .Theme.BackgroundImage }}') center/cover no-repeat{{ end }};
-}
-
-/* TOP MENU BAR */
-.top-bar {
-    width: 100%;
-    background: {{ .Theme.MenuColor }};
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 20px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-}
-
-.top-bar button {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 6px;
-    background: var(--accent);
-    color: #020617;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.top-bar button:hover {
-    background: #0ea5e9;
-}
-
-/* FILTER DROPDOWN */
-.filter {
-    margin: 16px 20px;
-    text-align: right;
-}
-
-.filter select {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: none;
-    background: #334155;
-    color: var(--text);
-    cursor: pointer;
-}
-
-/* THEME SETTINGS TABLE */
-.theme-settings {
-    max-width: 600px;
-    margin: 20px auto;
-    border-collapse: collapse;
-    width: 100%;
-}
-
-.theme-settings td {
-    padding: 6px;
-}
-
-/* ITEMS TABLE */
-table { 
-    border-collapse: collapse; 
-    width: 100%; 
-    max-width: 1200px; 
-    margin: 20px auto; 
-}
-th, td { 
-    padding: 6px; 
-    border: 1px solid #334155; 
-}
-input[type=text], input[type=url] { width: 100%; }
-input[type=color] { width: 60px; }
-
-.add-row { 
-    margin: 12px auto; 
-    cursor: pointer; 
-    color: var(--accent); 
-    font-weight: bold; 
-    text-align: center; 
-}
+body { display:flex; flex-direction: column; align-items: center; }
+h1 { margin-top: 20px; color: var(--text); }
+table { border-collapse: collapse; width: 100%; max-width: 1000px; }
+th, td { padding: 6px; border: 1px solid #334155; text-align:center; }
+input[type=text], input[type=url], input[type=color], input[type=file] { width: 100%; }
+.color { width: 60px; }
+.filter { margin-bottom: 12px; }
+.buttons { margin: 12px 0; display: flex; gap: 10px; }
+button { padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer; background: var(--accent); color: #020617; transition: background 0.2s; }
+button:hover:enabled { background: #0ea5e9; }
+button:disabled { background: #64748b; cursor: not-allowed; }
+.add-row { margin-top: 12px; cursor: pointer; color: var(--accent); font-weight: bold; }
 .add-row:hover { text-decoration: underline; }
-
-.buttons { 
-    margin: 12px 0; 
-    display: flex; 
-    gap: 10px; 
-    justify-content: center; 
-}
-button.save-btn { 
-    background: var(--accent); 
-    color: #020617; 
-}
-button.save-btn:hover { 
-    background: #0ea5e9; 
-}
-button:disabled { 
-    background: #64748b; 
-    cursor: not-allowed; 
-}
+.theme { margin-top: 20px; max-width: 1000px; display: flex; flex-direction: column; gap: 8px; }
+#manageForm { margin-top: 70px; width: 100%; max-width: 1000px; }
+img { max-height: 40px; display: block; margin: 4px auto; }
 </style>
 </head>
 <body>
 
-<!-- TOP MENU BAR -->
+<!-- Top Menu -->
 <div class="top-bar">
-    <div>Manage Dashboard Items</div>
+    <div>Dashboard Manager</div>
     <div>
-        <button onclick="window.location='/'">⬅ Return</button>
+        <button onclick="window.location='/'">⬅ Dashboard</button>
     </div>
 </div>
 
-<!-- FILTER DROPDOWN -->
+<h1>Manage Dashboard Items</h1>
+
+<!-- Filter by group -->
 <div class="filter">
-    <form method="get">
-        <label>
-            Filter by group:
-            <select name="group" onchange="this.form.submit()">
-                <option value="">All</option>
-                {{ range .AllGroups }}
-                    <option value="{{ . }}" {{ if eq $.SelectedGrp . }}selected{{ end }}>{{ . }}</option>
-                {{ end }}
-            </select>
-        </label>
-    </form>
+  <form method="get">
+    <label>Filter by group:
+      <select name="group" onchange="this.form.submit()">
+        <option value="">All</option>
+        {{ range .AllGroups }}
+          <option value="{{ . }}" {{ if eq $.SelectedGrp . }}selected{{ end }}>{{ . }}</option>
+        {{ end }}
+      </select>
+    </label>
+  </form>
 </div>
 
-<!-- THEME SETTINGS -->
-<h2 style="text-align:center; color: var(--text);">Theme Settings</h2>
-<form method="post" action="/save" id="manageForm">
-<table class="theme-settings">
-<tr>
-    <td>Background color</td>
-    <td><input type="color" name="background_color" value="{{ .Theme.BackgroundColor }}"></td>
-</tr>
-<tr>
-    <td>Menu / tile color</td>
-    <td><input type="color" name="menu_color" value="{{ .Theme.MenuColor }}"></td>
-</tr>
-<tr>
-    <td>Background image URL</td>
-    <td><input type="text" name="background_image" value="{{ .Theme.BackgroundImage }}"></td>
-</tr>
-</table>
-
-<!-- ITEMS TABLE -->
+<form method="post" action="/save" id="manageForm" enctype="multipart/form-data">
 <table id="itemsTable">
 <tr>
-  <th>Delete</th><th>Name</th><th>URL</th><th>Group</th><th>Color</th>
+  <th>Delete</th><th>Name</th><th>URL</th><th>Group</th><th>Color</th><th>Tile Image</th>
 </tr>
 {{ range .Items }}
 <tr>
@@ -162,23 +61,42 @@ button:disabled {
   <td><input type="text" name="id_{{ .ID }}_name" value="{{ .Name }}"></td>
   <td><input type="url" name="id_{{ .ID }}_url" value="{{ .URL }}"></td>
   <td><input type="text" name="id_{{ .ID }}_group" value="{{ .Group }}"></td>
-  <td><input type="color" name="id_{{ .ID }}_color" value="{{ .Color }}"></td>
+  <td><input type="color" name="id_{{ .ID }}_color" value="{{ .Color }}" class="color"></td>
+  <td>
+    {{ if .Image }}
+      <img src="{{ .Image }}">
+    {{ end }}
+    <input type="file" name="id_{{ .ID }}_file">
+    <input type="hidden" name="id_{{ .ID }}_image" value="{{ .Image }}">
+  </td>
 </tr>
 {{ end }}
-<!-- initial single new row -->
+
+<!-- New row template -->
 <tr class="new-row">
   <td>New</td>
   <td><input type="text" name="new_name[]"></td>
   <td><input type="url" name="new_url[]"></td>
   <td><input type="text" name="new_group[]"></td>
-  <td><input type="color" name="new_color[]" value="#38bdf8"></td>
+  <td><input type="color" name="new_color[]" class="color" value="#38bdf8"></td>
+  <td><input type="file" name="new_file[]"></td>
 </tr>
 </table>
 
 <div class="add-row" onclick="addNewRow()">➕ Add another row</div>
 
+<!-- Theme settings -->
+<div class="theme">
+  <h2>Theme Settings</h2>
+  <label>Background Color: <input type="color" name="background_color" value="{{ .Theme.BackgroundColor }}"></label>
+  <label>Menu Color: <input type="color" name="menu_color" value="{{ .Theme.MenuColor }}"></label>
+  <label>Background Image URL: <input type="text" name="background_image" value="{{ .Theme.BackgroundImage }}"></label>
+  <label>Upload Background Image: <input type="file" name="background_file"></label>
+</div>
+
 <div class="buttons">
-  <button type="submit" id="saveBtn" class="save-btn" disabled>💾 Save Changes</button>
+  <button type="submit" id="saveBtn" disabled>💾 Save Changes</button>
+  <button type="button" onclick="window.location='/'">⬅ Return</button>
 </div>
 </form>
 
@@ -186,28 +104,25 @@ button:disabled {
 const form = document.getElementById('manageForm');
 const saveBtn = document.getElementById('saveBtn');
 
-// Enable Save button when anything changes
-form.addEventListener('input', () => {
-    saveBtn.disabled = false;
-});
+// Enable Save button on any change
+form.addEventListener('input', () => { saveBtn.disabled = false; });
 
-// Add new empty row to items table
+// Add new row dynamically
 function addNewRow() {
-    const table = document.getElementById('itemsTable');
-    const row = document.createElement('tr');
-    row.classList.add('new-row');
-    row.innerHTML = `
-      <td>New</td>
-      <td><input type="text" name="new_name[]"></td>
-      <td><input type="url" name="new_url[]"></td>
-      <td><input type="text" name="new_group[]"></td>
-      <td><input type="color" name="new_color[]" value="#38bdf8"></td>
-    `;
-    table.appendChild(row);
-    saveBtn.disabled = false;
+  const table = document.getElementById('itemsTable');
+  const row = document.createElement('tr');
+  row.classList.add('new-row');
+  row.innerHTML = `
+    <td>New</td>
+    <td><input type="text" name="new_name[]"></td>
+    <td><input type="url" name="new_url[]"></td>
+    <td><input type="text" name="new_group[]"></td>
+    <td><input type="color" name="new_color[]" class="color" value="#38bdf8"></td>
+    <td><input type="file" name="new_file[]"></td>
+  `;
+  table.appendChild(row);
+  saveBtn.disabled = false;
 }
 </script>
-
 </body>
 </html>
-
