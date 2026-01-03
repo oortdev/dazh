@@ -10,18 +10,19 @@ import (
 	"strconv"
 )
 
-// DashboardHandler
+// DashboardHandler renders the main dashboard
 func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 	items := LoadItems()
 	selectedGrp := r.URL.Query().Get("group")
-	theme := LoadTheme()
 
+	// Group items by Group
 	groups := make(map[string][]Item)
 	allGroups := make(map[string]struct{})
 	for _, item := range items {
 		groups[item.Group] = append(groups[item.Group], item)
 		allGroups[item.Group] = struct{}{}
 	}
+
 	allGroupsList := []string{}
 	for g := range allGroups {
 		allGroupsList = append(allGroupsList, g)
@@ -33,7 +34,15 @@ func DashboardHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := DashboardData{
+	// Load theme (background image, colors, etc.)
+	theme := LoadTheme() // implement this to read from config.json or CSV
+
+	data := struct {
+		Groups      map[string][]Item
+		AllGroups   []string
+		SelectedGrp string
+		Theme       ThemeConfig
+	}{
 		Groups:      groups,
 		AllGroups:   allGroupsList,
 		SelectedGrp: selectedGrp,
