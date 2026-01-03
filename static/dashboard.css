@@ -1,7 +1,8 @@
 :root {
-    --hex-width: 120px;
-    --hex-height: 104px;
-    --hex-vertical-gap: 12px;
+    --hex-width: 180px;        /* larger tile width */
+    --hex-height: 156px;       /* width * sqrt(3)/2 */
+    --hex-vertical-gap: 18px;  /* increased gap for bigger tiles */
+
     --bg: #0f172a;
     --menu-color: #1e293b;
     --text: #e5e7eb;
@@ -65,13 +66,13 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 14px;
-    cursor: pointer;
-    transition: transform 0.2s ease, background 0.2s ease;
-    background-size: cover;
-    background-position: center;
+    padding: 0;
+    overflow: hidden;
+    background-color: var(--tile, #1e293b);
     color: var(--text);
     font-weight: 500;
+    position: relative;
+    transition: transform 0.2s ease, background 0.2s ease;
 }
 
 .hex:nth-child(odd) {
@@ -86,8 +87,38 @@ body {
     font-weight: 600;
 }
 
-.hex span { pointer-events: none; font-size: 0.95rem; line-height: 1.2; }
+/* Links and titles */
+.hex a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    color: inherit;
+    text-decoration: none;
+}
 
+.hex .tile-title {
+    display: block;
+    margin-top: -15px;       /* lowered margin for images */
+    font-size: 1rem;
+    font-weight: 500;
+    pointer-events: none;
+    text-align: center;
+}
+
+/* Images inside hex */
+.hex img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain; /* fit inside hex */
+    display: block;
+    pointer-events: none;
+}
+
+/* Responsive adjustments */
 @media (max-width: 600px) {
     .hex:nth-child(odd) { transform: none; }
     .dashboard { padding: 20px; margin-top: 60px; }

@@ -22,8 +22,13 @@
 
     {{ range $grp, $items := .Groups }}
         {{ range $items }}
-        <div class="hex" style="background: {{ if .Image }} url('{{ .Image }}') center/cover no-repeat; {{ else }} {{ .Color }}; {{ end }}">
-            <a href="{{ .URL }}" style="color:inherit; text-decoration:none;"><span>{{ .Name }}</span></a>
+        <div class="hex">
+            <a href="{{ .URL }}" style="color:inherit; text-decoration:none;">
+                {{ if .Image }}
+                    <img src="{{ .Image }}" alt="{{ .Name }}">
+                {{ end }}
+                <span class="tile-title">{{ .Name }}</span>
+            </a>
         </div>
         {{ end }}
     {{ end }}
